@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.wrap_avatar {
+    border-radius: 50%;
+    width: 75px;
+    height: 75px;
+    overflow: hidden;
+}
+
+.wrap_avatar img {
+    max-width: 100%;
+}
+
+.wrap_candidate_info p {
+    margin-bottom: .5rem;
+}
+
+.wrap_candidate_info .candidate_name {
+    max-width: 75%;
+}
+
+.wrap_contributor_form_table {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.wrap_contributor_form_table table {
+    margin-bottom: 16px;
+}
+
+h1 {
+    font-size: 1.25rem;
+}
+
+h2,
+h3 {
+    font-size: 1rem
+}
+
+h1,
+h2,
+h3 {
+    font-weight: bold;
+}

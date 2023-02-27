@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\JumlahSuaraBertambah;
 use Illuminate\Http\Request;
 
 use App\Models\KandidatPemilihan;
 use App\Models\ResumeTerkiniSeluruhIndonesia;
 use App\Models\ResumeTerkiniProvinsi;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ContributorController extends Controller
 {
@@ -66,6 +69,10 @@ class ContributorController extends Controller
             
             $resumeTerkiniProvinsi = new ResumeTerkiniProvinsi();
             
+            $resumeTerkiniSeluruhIndonesiaBaru = [];
+
+            $resumeTerkiniProvinsiBaru = [];
+
             foreach($dataInput as $key => $jumlahSuara) {
                 // 1. Split key ['kode_kandidat', 'kode_provinsi']
                 $splittedKey = explode('-', $key);
@@ -77,18 +84,50 @@ class ContributorController extends Controller
                 $kodeProvinsi = $splittedKey[1];
                 
                 // 4. Update overall resume kandidat menggunakan kode_kandidat
-                $resumeTerkiniSeluruhIndonesia->updateJumlahSuaraByKode($kodeKandidat, $jumlahSuara);
+                $rtsi_id = $resumeTerkiniSeluruhIndonesia->updateJumlahSuaraByKode($kodeKandidat, $jumlahSuara);
+
+                if ($rtsi_id !== null) {
+                    $resumeTerkiniSeluruhIndonesiaBaru[] = $rtsi_id;
+                }
 
                 // 5. Update resume kandidat per provinsi menggunakan kode_kandidat && kode_provinsi
-                $resumeTerkiniProvinsi->updateJumlahSuaraByKode($kodeKandidat, $kodeProvinsi, $jumlahSuara);
+                $rtp_id = $resumeTerkiniProvinsi->updateJumlahSuaraByKode($kodeKandidat, $kodeProvinsi, $jumlahSuara);
+
+                if ($rtp_id !== null) {
+                    $resumeTerkiniProvinsiBaru[] = $rtp_id;
+                }
             };
 
             DB::commit();
-        } catch (\Throwable $th) {
-            DB::rollBack();
-        }
 
-        return redirect()->route('contributor.create')->with('success', 'Data jumlah suara berhasil ditambahkan');
+            // payload pertama untuk resume_terkini_seluruh_indonesia
+            // "id": 1,
+            // "nama": "Ir. H. JOKO WIDODO - KH. MA’RUF AMIN",
+            // "partai": "PDI-P",
+            // "foto_capres": "kandidat/1-small.jpeg",
+            // "foto_cawapres": "kandidat/1-1-small.jpeg",
+            // "jumlah_suara": 0
+
+            // payload kedua untuk resume_terkini_provinsi
+            // id": 1,
+            // "id_kandidat": 1,
+            // "jumlah_suara": 0,
+            // "kode_provinsi": "dki",
+            // "provinsi": "DKI JAKARTA"
+
+            JumlahSuaraBertambah::dispatch(
+                $resumeTerkiniSeluruhIndonesiaBaru,
+                $resumeTerkiniProvinsiBaru
+            );
+
+            return redirect()->route('contributor.create')->with('success', 'Data jumlah suara berhasil ditambahkan');
+        } catch (QueryException $err) {
+            DB::rollBack();
+
+            Log::error('server err', ['res' => $err]);
+            
+            return redirect()->route('contributor.create')->with('error', 'Server error');
+        }
     }
 
     /**

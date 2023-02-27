@@ -70,32 +70,7 @@
       </div>
       <div class="col-md-12 mt-5">
         <div class="wrap_overall_resume">
-          <div class="row justify-content-center">
-            <!-- Start Candidate -->
-            @foreach($data['resume_terkini_seluruh_indonesia'] as $row)
-            <div class="col-lg-3 mt-3">
-              <div class="wrap_candidate">
-                <div class="card">
-                  <div class="card-body d-flex flex-column align-items-center">
-                    <div class="d-flex">
-                      <div class="wrap_avatar">
-                        <img src="{{ uploader($row['foto_capres']) }}" alt="{{ $row['nama'] }}">
-                      </div>
-                      <div class="wrap_avatar ms-2">
-                        <img src="{{ uploader($row['foto_cawapres']) }}" alt="{{ $row['nama'] }}">
-                      </div>
-                    </div>
-                    <div class="wrap_candidate_info py-3 text-center d-flex flex-column align-items-center">
-                      <p class="fw-bold candidate_name">{{ $row['nama'] }}</p>
-                      <p class="party_name">{{ $row['partai'] }}</p>
-                      <p class="ballot">{{ $konten['jumlah_suara'] }} {{ $row['jumlah_suara'] }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            @endforeach
-            <!-- End Candidate -->
+          <div id="resumeTerkiniSeluruhIndonesia" class="row justify-content-center">
           </div>
         </div>
       </div>
@@ -115,42 +90,7 @@
 
         <div class="col-md-12 mt-5">
           <div class="wrap_province_table">
-            <div class="row">
-              @foreach($data['kandidat_pemilihan'] as $index => $row)
-              <div class="col-lg-6 mt-3">
-                <div class="wrap_province_ballot">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div class="wrap_candidate_name">
-                        <h3>{{ $index + 1 }}. {{ $row['nama'] }}</h3>
-                      </div>
-                    </div>
-                    <div class="col-md-12 mt-3">
-                      <div class="wrap_province_table table-responsive">
-                        <table class="table table-hover table-bordered">
-                          <thead class="bg-light">
-                            <tr>
-                              <th>WILAYAH</th>
-                              <th>PEROLEHAN SUARA</th>
-                            </tr>
-                          </thead>
-
-                          <tbody class="bg-white">
-                            @foreach(cariResumeProvinsi($row['id'], $data['resume_terkini_provinsi']) as $row)
-                            <tr>
-                              <td>{{ $row['provinsi'] }}</td>
-                              <td>{{ $row['jumlah_suara'] }}</td>
-                            </tr>
-                            @endforeach
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              @endforeach
-            </div>
+            <div class="row" id="resumeTerkiniProvinsi"></div>
           </div>
         </div>
       </div>
@@ -159,6 +99,15 @@
   <!-- End Resume By Province -->
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+
+  <script>
+    window.resumeTerkiniSeluruhIndonesia = <?php echo json_encode($data['resume_terkini_seluruh_indonesia']); ?>;
+    window.kandidatPemilihan = <?php echo json_encode($data['kandidat_pemilihan']); ?>;
+    window.resumeTerkiniProvinsi = <?php echo json_encode($data['resume_terkini_provinsi']); ?>;
+    window.kontenJumlahSuara = <?php echo json_encode($konten['jumlah_suara']); ?>;
+  </script>
+
+  @vite(['resources/js/jumlahsuara.js'])
 </body>
 
 </html>

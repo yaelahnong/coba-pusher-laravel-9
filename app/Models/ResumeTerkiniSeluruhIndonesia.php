@@ -38,11 +38,25 @@ class ResumeTerkiniSeluruhIndonesia extends Model
     {
         $resume = $this->where('rtsi_kp_kode', $kodeKandidat)->first();
 
+        $resumeId = $resume->rtsi_id;
+
+        $currentJumlahSuara = $resume->rtsi_jumlah_suara;
+
         if ($jumlahSuara) {
             $resume->rtsi_jumlah_suara = $resume->rtsi_jumlah_suara + $jumlahSuara;
             
             $resume->save();
         }
+
+        if ($resume->rtsi_jumlah_suara > $currentJumlahSuara) {
+            return [
+                'id' => $resumeId,
+                'jumlah_suara' => $resume->rtsi_jumlah_suara,
+            ];
+        } else {
+            return null;
+        }
+
     }
 
     public function scopeJoinKandidatPemilihan($q)

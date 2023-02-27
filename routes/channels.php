@@ -18,6 +18,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
-Broadcast::channel('chat.{roomId}.{userInitial}', function ($user, $roomId, $userInitial) {
+Broadcast::channel('chat.{userIdPenerima}', function ($user, $userIdPenerima) {
     return Auth::check();
 });

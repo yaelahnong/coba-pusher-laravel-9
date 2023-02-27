@@ -1,3 +1,6 @@
+import axios from 'axios';
+window.axios = axios;
+
 import Echo from 'laravel-echo';
 
 import Pusher from 'pusher-js';
@@ -17,27 +20,79 @@ window.Echo = new Echo({
     wssPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
     forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
+    authorizer: (channel, options) => {
+        return {
+            authorize: (socketId, callback) => {
+                axios.post('/broadcasting/auth', {
+                    socket_id: socketId,
+                    channel_name: channel.name
+                })
+                .then(response => {
+                    callback(false, response.data);
+                })
+                .catch(error => {
+                    callback(true, error);
+                });
+            }
+        };
+    },
 });
 
-window.Echo.channel('chat')
+window.Echo.private('chat.'+window.userId)
 .listen('PesanTerkirim', (e) => {
-    window.pesan.push(e.pesan)
+    console.log('successfully listen')
+    if (window.inboxId === e.pesan.inbox_uid) {
+        window.pesan.push(e.pesan)
+    }
     renderMessageList();
-    let messageListContent = '';
+    renderRoomList();
 });
+
+function renderRoomList(newNotification = 0) {
+  let roomListContent = '';
+
+  console.log('newnotification', newNotification);
+
+  console.log('window roomlist', window.inbox)
+  console.log('roomcontent', roomListContent)
+
+  window.inbox.forEach((item) => {
+    roomListContent += `
+      <a href="${'/chat/'+item.inbox_uid}" class="block w-full py-5 focus:ring-0 outline-none cursor-pointer group transition-all duration-150 hover:bg-slate-100 dark:hover:bg-slate-600 dark:hover:bg-opacity-70">
+        <div class="flex space-x-3 px-6 rtl:space-x-reverse">
+          <div class="flex-none">
+            <div class="h-10 w-10 rounded-full relative"><span class="bg-secondary-500 status ring-1 ring-white inline-block h-[10px] w-[10px] rounded-full absolute -right-0 top-0"></span><img src="${uploader(item.foto)}" alt="" class="block w-full h-full object-cover rounded-full"></div>
+          </div>
+          <div class="flex-1 text-start flex">
+            <div class="flex-1"><span class="block text-slate-800 dark:text-slate-300 text-sm font-medium mb-[2px]">${item.nama}</span><span class="block text-slate-600 dark:text-slate-300 text-xs font-normal">${newNotification === item.inbox_uid ? (`<b>${item.pesan_terbaru || ''}</b>`) : (item.pesan_terbaru || '')}</span></div>
+            <div class="flex-none ltr:text-right rtl:text-end"><span class="block text-xs text-slate-400 dark:text-slate-400 font-normal">${item.pesan_updated_at}</span></div>
+          </div>
+        </div>
+      </a>
+    `;
+  })
+
+  const el = document.getElementById('roomList');
+
+  el.innerHTML = roomListContent;
+}
+
+function uploader(filename = '') {
+  return 'http://localhost/pemilu-2024/public/uploader/'+filename;
+}
+
 renderMessageList();
+
 function renderMessageList() {
     let messageListContent = '';
-    console.log('userinitial', window.userInitial)
-    
     window.pesan.forEach((item) => {
-        if (item.user_initial !== window.userInitial) {
+        if (item.user_id !== window.userId) {
             messageListContent += `
                 <div class="block md:px-6 px-4">
                     <div class="flex space-x-2 items-start group rtl:space-x-reverse">
                         <div class="flex-1 flex space-x-4 rtl:space-x-reverse">
                             <div>
-                                <div class="text-contrent p-3 bg-slate-100 dark:bg-slate-600 dark:text-slate-300 text-slate-600 text-sm font-normal mb-1 rounded-md flex-1 whitespace-pre-wrap break-all">${item.pesan}</div><span class="font-normal text-xs text-slate-400 dark:text-slate-400">${item.created_at}</span>
+                                <div class="text-contrent p-3 bg-slate-100 dark:bg-slate-600 dark:text-slate-300 text-slate-600 text-sm font-normal mb-1 rounded-md flex-1 whitespace-pre-wrap break-all">${item.pesan}</div><span class="font-normal text-xs text-slate-400 dark:text-slate-400">${item.pesan_created_at}</span>
                             </div>
                             <div class="opacity-0 invisible group-hover:opacity-100 group-hover:visible">
                             <div data-headlessui-state="" class="relative inline-block"><button id="headlessui-menu-button-63" type="button" aria-haspopup="true" aria-expanded="false" data-headlessui-state="" class="block w-full">
@@ -73,9 +128,12 @@ function renderMessageList() {
     })
 
     const messageListEl = document.getElementById('messageList');
+    const messageInputEl = document.getElementById('messageInput');
     
     messageListEl.innerHTML = messageListContent;
+
+    messageListEl.scrollTo(0, messageListEl.scrollHeight)
+
+    messageInputEl.focus();
     
 }
-
-

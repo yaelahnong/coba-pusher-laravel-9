@@ -40,11 +40,26 @@ class ResumeTerkiniProvinsi extends Model
                         ->where('rtp_mp_kode', $kodeProvinsi)
                         ->first();
 
+        $resumeId = $resume->rtp_id;
+
+        $currentJumlahSuara = $resume->rtp_jumlah_suara;
+
         if ($jumlahSuara) {
             $resume->rtp_jumlah_suara = $resume->rtp_jumlah_suara + $jumlahSuara;
             
             $resume->save();
         }
+
+        if ($resume->rtp_jumlah_suara > $currentJumlahSuara) {
+            return [
+                'id' => $resumeId,
+                'jumlah_suara' => $resume->rtp_jumlah_suara,
+            ];
+        } else {
+            return null;
+        }
+
+        
     }
 
     public function scopeJoinKandidatPemilihan($q)

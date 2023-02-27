@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Events\PesanTerkirim;
-use App\Models\PesanChat;
-use App\Models\ResumePesanChat;
+use App\Models\Message;
+use App\Models\Inbox;
+use App\Models\InboxParticipant;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,10 +21,10 @@ class ChatController extends Controller
      */
     public function index()
     {
-        $resumePesanChat = new ResumePesanChat();
+        $partisipanPesanChat = new InboxParticipant();
 
         return view('chat', [
-            'roomList' => $resumePesanChat->getUserChatRoomList(),
+            'roomList' => $partisipanPesanChat->getUserChatRoomList(),
         ]);
     }
 
@@ -46,19 +47,20 @@ class ChatController extends Controller
     public function store(Request $request, $roomId)
     {
         $user = Auth::user();
-
+        
         $validated = $request->validate([
             'pesan' => 'required',
         ]);
 
-        $resumePesanChat = new ResumePesanChat();
+        $resumePesanChat = new Inbox();
+        $partisipanPesanChat = new InboxParticipant();
 
         if ($resumePesanChat->roomNotFound($roomId)) {
             return null;
             // return redirect()->route('chat.show', $roomId)->with('error', 'Room not found');
         }
 
-        if ($resumePesanChat->senderIsNotAuthorized($roomId)) {
+        if ($partisipanPesanChat->senderIsNotAuthorized($roomId)) {
             return null;
             // return redirect()->route('chat.show', $roomId)->with('error', 'Unauthorized sender');
         }
@@ -68,19 +70,37 @@ class ChatController extends Controller
         try {
             $resumePesanChat->updateRoom($roomId, $validated['pesan']);
     
-            $pesanChat = new PesanChat();
+            $pesanChat = new Message();
+
+            $messagePayload = [
+                'inbox_uid' => $roomId,
+                'user_id' => Auth::user()->id,
+                'nama' => Auth::user()->name,
+                'pesan' => $validated['pesan'],
+                'pesan_created_at' => date('g:i A', strtotime(now())),
+            ];
             
-            $pesan = $pesanChat->storePesan($roomId, $validated['pesan']);
+            $pesanChat->storePesan($messagePayload);
 
             DB::commit();
 
-            broadcast(new PesanTerkirim($user, [
-                'room_id' => $pesan['pc_room_id'],
-                'user_initial' => $pesan['pc_user_initial'],
-                'nama' => $pesan['pc_pesan'],
-                'pesan' => $pesan['pc_pesan'],
-                'created_at' => date('g:i A', strtotime($pesan['created_at'])),
-            ], $roomId))->toOthers();
+            PesanTerkirim::dispatch($user, $messagePayload, $roomId, $request->userIdPenerima);
+
+            // broadcast(new PesanTerkirim($user, [
+            //     'inbox_uid' => $pesan['ms_in_id'],
+            //     'user_id' => $pesan['ms_user_id'],
+            //     'nama' => $pesan['ms_user_name'],
+            //     'pesan' => $pesan['ms_message'],
+            //     'created_at' => $pesan['ms_message_time'],
+            // ], $roomId));
+
+            // PesanTerkirim::dispatch($user, [
+            //     'inbox_uid' => $pesan['ms_in_id'],
+            //     'user_id' => $pesan['ms_user_id'],
+            //     'nama' => $pesan['ms_user_name'],
+            //     'pesan' => $pesan['ms_message'],
+            //     'pesan_created_at' => $pesan['ms_message_time'],
+            // ], $roomId, $request->userIdPenerima);
 
             return redirect()->route('chat.show', $roomId);
         } catch (QueryException $err) {
@@ -100,23 +120,25 @@ class ChatController extends Controller
      */
     public function show($roomId)
     {
-        $resumePesanChat = new ResumePesanChat();
+        $resumePesanChat = new Inbox();
+
+        $partisipanPesanChat = new InboxParticipant();
         
         if ($resumePesanChat->roomNotFound($roomId)) {
             return redirect()->route('chat.show', $roomId)->with('error', 'Room not found');
         }
 
-        if ($resumePesanChat->senderIsNotAuthorized($roomId)) {
+        if ($partisipanPesanChat->senderIsNotAuthorized($roomId)) {
             return redirect()->route('chat.show', $roomId)->with('error', 'Unauthorized sender');
         }
 
-        $roomList = $resumePesanChat->getUserChatRoomList();
+        $roomList = $partisipanPesanChat->getUserChatRoomList();
 
-        $activeRoom = $resumePesanChat->findRoomByRoomId($roomId);
+        $activeRoom = $partisipanPesanChat->findRoomByRoomId($roomId);
 
-        $pesanChat = new PesanChat();
+        $pesanChat = new Message();
 
-        $messageList = $pesanChat->getDataByRoomId($roomId);
+        $messageList = $pesanChat->getMessagesByRoomId($roomId);
 
         return view('chat', [
             'roomList' => $roomList,

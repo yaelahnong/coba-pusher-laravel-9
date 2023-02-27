@@ -21,6 +21,13 @@ class PesanTerkirim implements ShouldBroadcast
      * @var User
      */
     public $user;
+    
+    /**
+     * Informasi userId penerima
+     *
+     * @var User
+     */
+    public $userIdPenerima;
 
     /**
      * Isi pesan
@@ -41,12 +48,12 @@ class PesanTerkirim implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(User $user, array $pesan, string $roomId)
+    public function __construct(User $user, array $pesan, string $roomId, $userIdPenerima)
     {
+        $this->userIdPenerima = $userIdPenerima;
         $this->user = $user;
         $this->pesan = $pesan;
         $this->roomId = $roomId;
-        $this->dontBroadcastToCurrentUser();
     }
 
     /**
@@ -56,6 +63,6 @@ class PesanTerkirim implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('chat');
+        return new PrivateChannel('chat.'.$this->userIdPenerima);
     }
 }

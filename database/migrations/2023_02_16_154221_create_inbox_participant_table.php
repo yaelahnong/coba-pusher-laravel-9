@@ -13,11 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('r_pesan_chat', function (Blueprint $table) {
-            $table->string('rpc_room_id', 32)->primary();
-            $table->string('rpc_pesan_terbaru', 128)->nullable();
-            $table->string('rpc_waktu_kirim_terbaru', 16)->nullable();
+        Schema::create('inbox_participant', function (Blueprint $table) {
+            $table->increments('ip_id');
+            $table->unsignedTinyInteger('ip_user_id');
+            $table->string('ip_in_id', 32);
             $table->timestamps();
+            $table->foreign('ip_in_id')->references('in_id')->on('inbox');
+            $table->foreign('ip_user_id')->references('id')->on('users');
         });
     }
 
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('r_pesan_chat');
+        Schema::dropIfExists('inbox_participant');
     }
 };

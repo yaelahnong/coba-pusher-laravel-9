@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->tinyIncrements('id');
-            $table->char('initial', 2)->nullable();
             $table->string('avatar', 128)->nullable();
             $table->string('name');
             $table->string('email')->unique();

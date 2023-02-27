@@ -194,7 +194,6 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
     ],
 
     /*
@@ -212,4 +211,6 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 
+    'uploader' => env('UPLOADER_URL'),
+    'baseUrl' => env('APP_URL'),
 ];

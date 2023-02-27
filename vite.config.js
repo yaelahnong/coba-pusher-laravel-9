@@ -9,6 +9,7 @@ export default defineConfig({
                 'resources/css/chat.css',
                 'resources/js/app.js',
                 'resources/js/broadcasting.js',
+                'resources/js/jumlahsuara.js',
             ],
             refresh: true,
         }),

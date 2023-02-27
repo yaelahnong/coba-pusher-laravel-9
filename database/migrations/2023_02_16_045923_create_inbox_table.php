@@ -13,13 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('partisipan_pesan_chat', function (Blueprint $table) {
-            $table->increments('ppc_id');
-            $table->string('ppc_room_id', 32);
-            $table->char('ppc_user_initial', 2);
-            $table->unsignedTinyInteger('ppc_user_id');
+        Schema::create('inbox', function (Blueprint $table) {
+            $table->string('in_id', 32)->primary();
+            $table->string('in_last_message', 128)->nullable();
+            $table->string('in_last_message_time', 16)->nullable();
+            $table->string('in_last_sent_user_id', 16)->nullable();
             $table->timestamps();
-            $table->foreign('ppc_room_id')->references('rpc_room_id')->on('r_pesan_chat');
         });
     }
 
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('partisipan_pesan_chat');
+        Schema::dropIfExists('inbox');
     }
 };

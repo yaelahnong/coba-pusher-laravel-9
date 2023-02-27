@@ -4,12 +4,17 @@ use Illuminate\Database\Eloquent\Collection;
 
 function uploader($filename = '')
 {
-    return env('UPLOADER_URL') . $filename;
+  return config('app.uploader') . $filename;
+}
+
+function baseUrl($filename = '')
+{
+  return config('app.baseUrl') . $filename;
 }
 
 function cariResumeProvinsi($idKandidat, Collection $dataResume)
 {
-    return $dataResume->where('id_kandidat', $idKandidat)->values()->all();
+  return $dataResume->where('id_kandidat', $idKandidat)->values()->all();
 }
 
 function cetakStringAngkaAcak($length = 10)

@@ -33,15 +33,15 @@ class DatabaseSeeder extends Seeder
         
         $kandidat[1] = \App\Models\KandidatPemilihan::create([
             'kp_kode' => 'kp02',
-            'kp_nama' => "ANIES RASYID BASWEDAN - KH. MA’RUF AMIN",
+            'kp_nama' => "ANIES RASYID BASWEDAN - SANDIAGA SALAHUDDIN UNO",
             'kp_partai' => 'Nasdem',
             'kp_foto_capres' => 'kandidat/2-small.jpeg',
-            'kp_foto_cawapres' => 'kandidat/2-1-small.jpeg',
+            'kp_foto_cawapres' => 'kandidat/2-1-small.png',
         ]);
         
         $kandidat[2] = \App\Models\KandidatPemilihan::create([
             'kp_kode' => 'kp03',
-            'kp_nama' => "GANJAR PRANOWO - KH. MA’RUF AMIN",
+            'kp_nama' => "GANJAR PRANOWO - PRABOWO SUBIANTO",
             'kp_partai' => 'PDI-P',
             'kp_foto_capres' => 'kandidat/3-small.jpeg',
             'kp_foto_cawapres' => 'kandidat/3-1-small.jpeg',
@@ -114,7 +114,6 @@ class DatabaseSeeder extends Seeder
 
         \App\Models\User::create([
             'name' => 'Administrator',
-            'initial' => 'am',
             'avatar' => 'kandidat/1-small.jpeg',
             'email' => 'marinoimola@gmail.com',
             'password' => Hash::make('rahasia!'),
@@ -122,29 +121,203 @@ class DatabaseSeeder extends Seeder
 
         \App\Models\User::create([
             'name' => 'Marino Imola',
-            'initial' => 'mi',
             'avatar' => 'kandidat/1-small.jpeg',
             'email' => 'marinoimola@yahoo.com',
             'password' => Hash::make('rahasia!'),
         ]);
 
-        $roomId = 'am-mi-' . date('ymd') . cetakStringAngkaAcak(3);
-
-        \App\Models\ResumePesanChat::create([
-            'rpc_room_id' => $roomId,
-            'rpc_pesan_terbaru' => null
+        \App\Models\User::create([
+            'name' => 'Bara Aksayeth',
+            'avatar' => 'kandidat/1-small.jpeg',
+            'email' => 'bara@lingkar9.com',
+            'password' => Hash::make('rahasia!'),
         ]);
 
-        \App\Models\PartisipanPesanChat::create([
-            'ppc_room_id' => $roomId,
-            'ppc_user_initial' => 'am',
-            'ppc_user_id' => 1
+        \App\Models\User::create([
+            'name' => 'Ahmad Bahtiarsyah',
+            'avatar' => 'kandidat/1-small.jpeg',
+            'email' => 'bahtiarsyah@lingkar9.com',
+            'password' => Hash::make('admin123'),
         ]);
 
-        \App\Models\PartisipanPesanChat::create([
-            'ppc_room_id' => $roomId,
-            'ppc_user_initial' => 'mi',
-            'ppc_user_id' => 2
+        \App\Models\User::create([
+            'name' => 'Subhan Abdullah',
+            'avatar' => 'kandidat/1-small.jpeg',
+            'email' => 'subhan@lingkar9.com',
+            'password' => Hash::make('admin123'),
+        ]);
+
+        \App\Models\User::create([
+            'name' => 'Tito Shadam',
+            'avatar' => 'kandidat/1-small.jpeg',
+            'email' => 'tito@lingkar9.com',
+            'password' => Hash::make('admin123'),
+        ]);
+
+        \App\Models\User::create([
+            'name' => 'Cryan Fajri',
+            'avatar' => 'kandidat/1-small.jpeg',
+            'email' => 'cryan@rundeglobe.com',
+            'password' => Hash::make('admin123'),
+        ]);
+
+        \App\Models\User::create([
+            'name' => 'Virgianto Eko',
+            'avatar' => 'kandidat/1-small.jpeg',
+            'email' => 'eko@lingkar9.com',
+            'password' => Hash::make('admin123'),
+        ]);
+
+        $roomIdAmMi = 'am-mi-' . date('ymd') . cetakStringAngkaAcak(3);
+
+        \App\Models\Inbox::create([
+            'in_id' => $roomIdAmMi,
+            'in_last_message' => null,
+            'in_last_message_time' => null,
+            'in_last_sent_user_id' => null,
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $roomIdAmMi,
+            'ip_user_id' => 1
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $roomIdAmMi,
+            'ip_user_id' => 2
+        ]);
+
+        $roomIdAmMb = 'am-mb-' . date('ymd') . cetakStringAngkaAcak(3);
+
+        \App\Models\Inbox::create([
+            'in_id' => $roomIdAmMb,
+            'in_last_message' => null,
+            'in_last_message_time' => null,
+            'in_last_sent_user_id' => null,
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $roomIdAmMb,
+            'ip_user_id' => 1
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $roomIdAmMb,
+            'ip_user_id' => 3
+        ]);
+
+        $roomIdMiMb = 'mi-mb-' . date('ymd') . cetakStringAngkaAcak(3);
+
+        \App\Models\Inbox::create([
+            'in_id' => $roomIdMiMb,
+            'in_last_message' => null,
+            'in_last_message_time' => null,
+            'in_last_sent_user_id' => null,
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $roomIdMiMb,
+            'ip_user_id' => 2
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $roomIdMiMb,
+            'ip_user_id' => 3
+        ]);
+
+        $a = 'am-ab-' . date('ymd') . cetakStringAngkaAcak(3);
+
+        \App\Models\Inbox::create([
+            'in_id' => $a,
+            'in_last_message' => null,
+            'in_last_message_time' => null,
+            'in_last_sent_user_id' => null,
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $a,
+            'ip_user_id' => 1
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $a,
+            'ip_user_id' => 4
+        ]);
+
+        $b = 'am-sa-' . date('ymd') . cetakStringAngkaAcak(3);
+
+        \App\Models\Inbox::create([
+            'in_id' => $b,
+            'in_last_message' => null,
+            'in_last_message_time' => null,
+            'in_last_sent_user_id' => null,
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $b,
+            'ip_user_id' => 1
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $b,
+            'ip_user_id' => 5
+        ]);
+
+        $c = 'am-ts-' . date('ymd') . cetakStringAngkaAcak(3);
+
+        \App\Models\Inbox::create([
+            'in_id' => $c,
+            'in_last_message' => null,
+            'in_last_message_time' => null,
+            'in_last_sent_user_id' => null,
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $c,
+            'ip_user_id' => 1
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $c,
+            'ip_user_id' => 6
+        ]);
+
+        $d = 'am-cf-' . date('ymd') . cetakStringAngkaAcak(3);
+
+        \App\Models\Inbox::create([
+            'in_id' => $d,
+            'in_last_message' => null,
+            'in_last_message_time' => null,
+            'in_last_sent_user_id' => null,
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $d,
+            'ip_user_id' => 1
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $d,
+            'ip_user_id' => 7
+        ]);
+
+        $e = 'am-ve-' . date('ymd') . cetakStringAngkaAcak(3);
+
+        \App\Models\Inbox::create([
+            'in_id' => $e,
+            'in_last_message' => null,
+            'in_last_message_time' => null,
+            'in_last_sent_user_id' => null,
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $e,
+            'ip_user_id' => 1
+        ]);
+
+        \App\Models\InboxParticipant::create([
+            'ip_in_id' => $e,
+            'ip_user_id' => 8
         ]);
     }
 }
